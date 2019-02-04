@@ -14,7 +14,7 @@ Scolor = "green"
 Estate = "Good"
 Ecolor = "green"
 
-endstat = "false"
+#endstat = "false"
 
 temp = 80
 weight = 10
@@ -23,7 +23,7 @@ weight = 10
 
 
 def eightozcheck(): #Making the State label depend on button selection, temperature, weight, and vibration
-    while endstat != "true":
+    #while endstat != "true":
         if temp < 90:
             StateTxt.config(text = "Brewing", bg = "yellow")
         elif 90 <temp <105:
@@ -41,7 +41,7 @@ def eightozcheck(): #Making the State label depend on button selection, temperat
 
 
 def tenozcheck():
-    while endstat != "true":
+    #while endstat != "true":
         if temp < 90:
             StateTxt.config(text="Brewing", bg ="yellow")
         elif 90 < temp < 105:
@@ -57,7 +57,7 @@ def tenozcheck():
         elif 9.5 < weight < 10.5:
             ErrorTxt.config(text = "Good")
 def twelveozcheck():
-    while endstat != "true":
+    #while endstat != "true":
         if temp < 90:
             StateTxt.config(text="Brewing", bg="yellow")
         elif 90 < temp < 105:
@@ -72,8 +72,8 @@ def twelveozcheck():
             ErrorTxt.config(text="Remove Water")
         elif 11.5 < weight < 12.5:
             ErrorTxt.config(text="Good")
-def endpress():
-    endstat = "true"
+#def endpress():
+    #endstat = "true"
 
 
 #------------------------------------
@@ -104,8 +104,8 @@ tenozB.place(x = 160, y = 80)
 twelveozB = Button(Window, text = "12oz", width = 6, font = 20, bg = "cyan", command = twelveozcheck)
 twelveozB.place(x = 280, y = 80)
 
-endB = Button(Window, text = "End", width = 6, font = 20, bg = "red", command = endpress)
-endB.place(x = 0, y = 0)
+#endB = Button(Window, text = "End", width = 6, font = 20, bg = "red", command = endpress)
+#endB.place(x = 0, y = 0)
 
 #Placing objects
 StateTxt.place(x=40, y= 200)
