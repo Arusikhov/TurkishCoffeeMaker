@@ -4,50 +4,22 @@
 
 from tkinter import *
 from PIL import Image, ImageTk
+import time
 
 
 
 #------------------------------------
 #Test Data
-Sstate = "Brewing"
-Scolor = "green"
-Estate = "Good"
-Ecolor = "green"
-
-#endstat = "false"
-
-temp = 80
-weight = 10
+weight = 8
 #-------------------------------------
 #Functions
 
-
-def eightozcheck(): #Making the State label depend on button selection, temperature, weight, and vibration
-    #while endstat != "true":
-        if temp < 90:
-            StateTxt.config(text = "Brewing", bg = "yellow")
-        elif 90 <temp <105:
-            StateTxt.config(text = "Ready", bg = "green")
-        elif temp > 105:
-            StateTxt.config(text = "Not Ready", bg = "red")
-        if weight < 7.5:
-            StateTxt.config(text = "Not Ready", bg = "red")
-            ErrorTxt.config(text = "Add Water", bg = "red")
-        elif weight > 8.5:
-            StateTxt.config(text="Not Ready", bg ="red")
-            ErrorTxt.config(text = "Remove Water", bg = "red")
-        elif 7.5 < weight < 8.5:
-            ErrorTxt.config(text = "Good", bg = "green")
+#StateTxt.config(text = "Standby", bg = "yellow")
+#ErrorTxt.config(text = " ", bg = "green")
 
 
 def tenozcheck():
     #while endstat != "true":
-        if temp < 90:
-            StateTxt.config(text="Brewing", bg ="yellow")
-        elif 90 < temp < 105:
-            StateTxt.config(text="Ready", bg ="green")
-        elif temp > 105:
-            StateTxt.config(text="Not Ready", bg ="red")
         if weight < 9.5:
             StateTxt.config(text = "Not Ready", bg = "red")
             ErrorTxt.config(text = "Add Water", bg = "red")
@@ -58,12 +30,6 @@ def tenozcheck():
             ErrorTxt.config(text = "Good", bg = "green")
 def twelveozcheck():
     #while endstat != "true":
-        if temp < 90:
-            StateTxt.config(text="Brewing", bg="yellow")
-        elif 90 < temp < 105:
-            StateTxt.config(text="Ready", bg="green")
-        elif temp > 105:
-            StateTxt.config(text="Not Ready", bg="red")
         if weight < 11.5:
             StateTxt.config(text="Not Ready", bg="red")
             ErrorTxt.config(text="Add Water", bg ="red")
@@ -79,6 +45,35 @@ def twelveozcheck():
 #------------------------------------
 #Window program
 Window = Tk()
+
+eozB = 0
+temp = 80
+
+
+def eightozcheck():  # Making the State label depend on button selection, temperature, weight, and vibration
+    global temp
+    if weight < 7.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Add Water", bg="red")
+    elif weight > 8.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Remove Water", bg="red")
+    elif 7.5 < weight < 8.5:
+        ErrorTxt.config(text=" ", bg="green")
+        StateTxt.config(text="Brewing", bg="yellow")
+        if temp < 95:
+            global eozB
+            eozB = 1
+            temp += 1
+            print("temp increased")
+            Window.after(100, eightozcheck)
+        else:
+            eozB = 0
+            StateTxt.config(text="Ready", bg="green")
+            print("temp done")
+
+
+
 Window.geometry("480x320")
 Window.configure(background = 'black')
 
@@ -116,4 +111,9 @@ Pic = Label(Window, image = photo)
 Pic.image = photo
 Pic.pack()
 Pic.place(x= 160, y = 160)
+
+#trying to use after function to recursively call the eightozcheck function
+if eozB == 1:
+    Window.after(1000, eightozcheck)
+
 Window.mainloop()
