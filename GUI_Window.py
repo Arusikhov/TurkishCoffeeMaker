@@ -1,6 +1,6 @@
 #Andrew Beechko
-#CSE 308 Lab 2
-#Last Edited 1-28-2019
+#CSE 308 Project GUI
+#Last Edited 2-3-19
 
 from tkinter import *
 from PIL import Image, ImageTk
