@@ -32,12 +32,12 @@ def eightozcheck(): #Making the State label depend on button selection, temperat
             StateTxt.config(text = "Not Ready", bg = "red")
         if weight < 7.5:
             StateTxt.config(text = "Not Ready", bg = "red")
-            ErrorTxt.config(text = "Add Water")
+            ErrorTxt.config(text = "Add Water", bg = "red")
         elif weight > 8.5:
             StateTxt.config(text="Not Ready", bg ="red")
-            ErrorTxt.config(text = "Remove Water")
+            ErrorTxt.config(text = "Remove Water", bg = "red")
         elif 7.5 < weight < 8.5:
-            ErrorTxt.config(text = "Good")
+            ErrorTxt.config(text = "Good", bg = "green")
 
 
 def tenozcheck():
@@ -50,12 +50,12 @@ def tenozcheck():
             StateTxt.config(text="Not Ready", bg ="red")
         if weight < 9.5:
             StateTxt.config(text = "Not Ready", bg = "red")
-            ErrorTxt.config(text = "Add Water")
+            ErrorTxt.config(text = "Add Water", bg = "red")
         elif weight > 10.5:
             StateTxt.config(text="Not Ready", bg ="red")
-            ErrorTxt.config(text = "Remove Water")
+            ErrorTxt.config(text = "Remove Water", bg = "red")
         elif 9.5 < weight < 10.5:
-            ErrorTxt.config(text = "Good")
+            ErrorTxt.config(text = "Good", bg = "green")
 def twelveozcheck():
     #while endstat != "true":
         if temp < 90:
@@ -66,12 +66,12 @@ def twelveozcheck():
             StateTxt.config(text="Not Ready", bg="red")
         if weight < 11.5:
             StateTxt.config(text="Not Ready", bg="red")
-            ErrorTxt.config(text="Add Water")
+            ErrorTxt.config(text="Add Water", bg ="red")
         elif weight > 12.5:
             StateTxt.config(text="Not Ready", bg="red")
-            ErrorTxt.config(text="Remove Water")
+            ErrorTxt.config(text="Remove Water", bg = "red")
         elif 11.5 < weight < 12.5:
-            ErrorTxt.config(text="Good")
+            ErrorTxt.config(text="Good", bg ="green")
 #def endpress():
     #endstat = "true"
 
@@ -79,7 +79,7 @@ def twelveozcheck():
 #------------------------------------
 #Window program
 Window = Tk()
-Window.geometry("400x400")
+Window.geometry("480x320")
 Window.configure(background = 'black')
 
 #Immage
@@ -108,8 +108,8 @@ twelveozB.place(x = 280, y = 80)
 #endB.place(x = 0, y = 0)
 
 #Placing objects
-StateTxt.place(x=40, y= 200)
-ErrorTxt.place(x = 20, y = 320)
+StateTxt.place(x=40, y= 160)
+ErrorTxt.place(x = 20, y = 220)
 TopTxt.pack(side = TOP)
 
 Pic = Label(Window, image = photo)
