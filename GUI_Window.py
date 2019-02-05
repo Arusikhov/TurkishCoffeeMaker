@@ -11,12 +11,12 @@ import time
 #------------------------------------
 #Test Data
 weight = 10
-
 temp = 80
-#------------------------------------
+################################################################################################
 #Window program
 Window = Tk()
-
+#-----------------------------------
+#Runtime Variable Triggers
 eozB = 0
 nozB = 0
 tozB = 0
@@ -25,24 +25,24 @@ twozB = 0
 
 #----------------------------------------------------------------------------
 #Functions
-def eightozcheck():  # Making the State label depend on button selection, temperature, weight, and vibration
-    global temp
-    if weight < 7.5:
+def eightozcheck(): #button command def
+    global temp #makes temp variable accessible in the function
+    if weight < 7.5:    #checks to see if weight is within the range of the button
         StateTxt.config(text="Not Ready", bg="red")
         ErrorTxt.config(text="Add Water", bg="red")
     elif weight > 8.5:
         StateTxt.config(text="Not Ready", bg="red")
         ErrorTxt.config(text="Remove Water", bg="red")
-    elif 7.5 < weight < 8.5:
+    elif 7.5 < weight < 8.5:    #if weight is in range, starts our loop
         ErrorTxt.config(text=" ", bg="green")
         StateTxt.config(text="Brewing", bg="yellow")
-        if temp < 95:
+        if temp < 95:   #as long as the temp is below this number, the loop will continue and commands can be performed
             global eozB
             eozB = 1
             temp += 1
             print("temp increased")
-            Window.after(100, eightozcheck)
-        else:
+            Window.after(100, eightozcheck) #updates the display so the window wont freeze durring rintime
+        else:#breaks out of the loop once the temp condition is met and changes lables
             eozB = 0
             StateTxt.config(text="Ready", bg="green")
             print("temp done")
@@ -133,7 +133,7 @@ def twelveozcheck():
             StateTxt.config(text = "Ready", bg = "green")
             print("Temp done")
 
-def endbutton():
+def endbutton():#resets all runtime variable triggers
     global eozB, nozB, tozB, elozB, twozB
     eozB = 0
     nozB = 0
@@ -143,19 +143,22 @@ def endbutton():
     StateTxt.config(text = "Ended", bg = "yellow")
     ErrorTxt.config(text = "Ended", bg = "yellow")
 #--------------------------------------------------------------------
+#Window Format
+
 Window.geometry("480x320")
 Window.configure(background = 'black')
-
-#Immage
-im = Image.open("TurkishCoffeMakerImage.png")
-photo = ImageTk.PhotoImage(im)
-
+#-------------------------------------------------------------------
 #Lables
+
 StateTxt = Label(Window, relief = RIDGE,bg = "green", text = "Waiting", font = 20, width = 8)
+StateTxt.place(x=40, y= 160)
 
 ErrorTxt = Label(Window, relief = RIDGE,bg = "green", text = " ", font = 20, width = 12 )
+ErrorTxt.place(x = 20, y = 220)
 
 TopTxt = Label(Window, text = "The Perfect Brew", relief = RIDGE, bg = "cyan", font = 20, width = 16)
+TopTxt.pack(side = TOP)
+
 #---------------------------------------------------------------------
 #Buttons
 
@@ -177,19 +180,17 @@ twelveozB.place(x = 330, y = 60)
 endB = Button(Window, text = "STOP", width = 6, font = 20, bg = "red", command = endbutton)
 endB.place(x= 410, y=60)
 #-----------------------------------------------------------------------------
+#Immage
 
-#Placing objects
-StateTxt.place(x=40, y= 160)
-ErrorTxt.place(x = 20, y = 220)
-TopTxt.pack(side = TOP)
-
+im = Image.open("TurkishCoffeMakerImage.png")
+photo = ImageTk.PhotoImage(im)
 Pic = Label(Window, image = photo)
 Pic.image = photo
 Pic.pack()
 Pic.place(x= 220, y = 100)
+#----------------------------------------------------------------------------
 
-#trying to use after function to recursively call the eightozcheck function
-if eozB == 1:
-    Window.after(1000, eightozcheck)
 
+
+#end of window loop
 Window.mainloop()
