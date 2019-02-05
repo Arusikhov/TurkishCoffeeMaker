@@ -10,7 +10,7 @@ import time
 
 #------------------------------------
 #Test Data
-weight = 8
+weight = 10
 
 temp = 80
 #------------------------------------
@@ -18,7 +18,9 @@ temp = 80
 Window = Tk()
 
 eozB = 0
+nozB = 0
 tozB = 0
+elozB = 0
 twozB = 0
 
 #----------------------------------------------------------------------------
@@ -45,6 +47,28 @@ def eightozcheck():  # Making the State label depend on button selection, temper
             StateTxt.config(text="Ready", bg="green")
             print("temp done")
 
+def nineozcheck():
+    global temp
+    if weight<8.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Add Water", bg="red")
+    elif weight > 9.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Remove Water", bg="red")
+    elif 8.5< weight <9.5:
+        ErrorTxt.config(text=" ", bg="green")
+        StateTxt.config(text="Brewing", bg="yellow")
+        if temp < 95:
+            global nozB
+            nozB += 1
+            print("Temp increased")
+            Window.after(100, nineozcheck)
+        else:
+            nozB = 0
+            StateTxt.config(text="Ready", bg="green")
+            print("temp done")
+
+
 def tenozcheck():
         global temp
         global tozB
@@ -66,6 +90,26 @@ def tenozcheck():
                 tozB = 0
                 StateTxt.config(text = "Ready", bg = "green")
                 print("Temp done")
+
+def elevenozcheck():
+    if weight < 10.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Add Water", bg="red")
+    elif weight > 11.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Remove Water", bg="red")
+    elif 10.5 < weight < 11.5:
+        ErrorTxt.config(text="Good", bg="green")
+        StateTxt.config(text="Brewing", bg="yellow")
+        if temp < 95:
+            global elozB
+            elozB += 1
+            print("temp increased")
+            Window.after(100, elevenozcheck)
+        else:
+            elozB = 0
+            StateTxt.config(text="Ready", bg="green")
+            print("Temp done")
 
 
 def twelveozcheck():
@@ -102,19 +146,19 @@ StateTxt = Label(Window, relief = RIDGE,bg = "green", text = "Waiting", font = 2
 ErrorTxt = Label(Window, relief = RIDGE,bg = "green", text = " ", font = 20, width = 12 )
 
 TopTxt = Label(Window, text = "The Perfect Brew", relief = RIDGE, bg = "cyan", font = 20, width = 16)
-
+#---------------------------------------------------------------------
 #Buttons
 
 eightozB = Button(Window, text = "8oz", width = 6, font = 20, bg = "cyan", command = eightozcheck)
 eightozB.place(x = 10, y = 60)
 
-nineozB = Button(Window, text = "9oz", width = 6, font = 20, bg = "cyan")
+nineozB = Button(Window, text = "9oz", width = 6, font = 20, bg = "cyan", command = nineozcheck)
 nineozB.place(x=90, y = 60)
 
 tenozB = Button(Window, text = "10oz", width = 6, font = 20, bg = "cyan", command = tenozcheck)
 tenozB.place(x = 170, y = 60)
 
-elevenozB = Button(Window, text = "11oz", width = 6, font = 20, bg = "cyan")
+elevenozB = Button(Window, text = "11oz", width = 6, font = 20, bg = "cyan", command = elevenozcheck)
 elevenozB.place(x = 250, y = 60)
 
 twelveozB = Button(Window, text = "12oz", width = 6, font = 20, bg = "cyan", command = twelveozcheck)
@@ -122,8 +166,7 @@ twelveozB.place(x = 330, y = 60)
 
 endB = Button(Window, text = "STOP", width = 6, font = 20, bg = "red")
 endB.place(x= 410, y=60)
-#endB = Button(Window, text = "End", width = 6, font = 20, bg = "red", command = endpress)
-#endB.place(x = 0, y = 0)
+#-----------------------------------------------------------------------------
 
 #Placing objects
 StateTxt.place(x=40, y= 160)
