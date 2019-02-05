@@ -106,14 +106,22 @@ TopTxt = Label(Window, text = "The Perfect Brew", relief = RIDGE, bg = "cyan", f
 #Buttons
 
 eightozB = Button(Window, text = "8oz", width = 6, font = 20, bg = "cyan", command = eightozcheck)
-eightozB.place(x = 40, y = 80)
+eightozB.place(x = 10, y = 60)
+
+nineozB = Button(Window, text = "9oz", width = 6, font = 20, bg = "cyan")
+nineozB.place(x=90, y = 60)
 
 tenozB = Button(Window, text = "10oz", width = 6, font = 20, bg = "cyan", command = tenozcheck)
-tenozB.place(x = 160, y = 80)
+tenozB.place(x = 170, y = 60)
+
+elevenozB = Button(Window, text = "11oz", width = 6, font = 20, bg = "cyan")
+elevenozB.place(x = 250, y = 60)
 
 twelveozB = Button(Window, text = "12oz", width = 6, font = 20, bg = "cyan", command = twelveozcheck)
-twelveozB.place(x = 280, y = 80)
+twelveozB.place(x = 330, y = 60)
 
+endB = Button(Window, text = "STOP", width = 6, font = 20, bg = "red")
+endB.place(x= 410, y=60)
 #endB = Button(Window, text = "End", width = 6, font = 20, bg = "red", command = endpress)
 #endB.place(x = 0, y = 0)
 
@@ -125,7 +133,7 @@ TopTxt.pack(side = TOP)
 Pic = Label(Window, image = photo)
 Pic.image = photo
 Pic.pack()
-Pic.place(x= 160, y = 160)
+Pic.place(x= 220, y = 100)
 
 #trying to use after function to recursively call the eightozcheck function
 if eozB == 1:
