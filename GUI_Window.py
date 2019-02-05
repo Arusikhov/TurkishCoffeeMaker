@@ -11,45 +11,18 @@ import time
 #------------------------------------
 #Test Data
 weight = 8
-#-------------------------------------
-#Functions
 
-#StateTxt.config(text = "Standby", bg = "yellow")
-#ErrorTxt.config(text = " ", bg = "green")
-
-
-def tenozcheck():
-    #while endstat != "true":
-        if weight < 9.5:
-            StateTxt.config(text = "Not Ready", bg = "red")
-            ErrorTxt.config(text = "Add Water", bg = "red")
-        elif weight > 10.5:
-            StateTxt.config(text="Not Ready", bg ="red")
-            ErrorTxt.config(text = "Remove Water", bg = "red")
-        elif 9.5 < weight < 10.5:
-            ErrorTxt.config(text = "Good", bg = "green")
-def twelveozcheck():
-    #while endstat != "true":
-        if weight < 11.5:
-            StateTxt.config(text="Not Ready", bg="red")
-            ErrorTxt.config(text="Add Water", bg ="red")
-        elif weight > 12.5:
-            StateTxt.config(text="Not Ready", bg="red")
-            ErrorTxt.config(text="Remove Water", bg = "red")
-        elif 11.5 < weight < 12.5:
-            ErrorTxt.config(text="Good", bg ="green")
-#def endpress():
-    #endstat = "true"
-
-
+temp = 80
 #------------------------------------
 #Window program
 Window = Tk()
 
 eozB = 0
-temp = 80
+tozB = 0
+twozB = 0
 
-
+#----------------------------------------------------------------------------
+#Functions
 def eightozcheck():  # Making the State label depend on button selection, temperature, weight, and vibration
     global temp
     if weight < 7.5:
@@ -72,8 +45,50 @@ def eightozcheck():  # Making the State label depend on button selection, temper
             StateTxt.config(text="Ready", bg="green")
             print("temp done")
 
+def tenozcheck():
+        global temp
+        global tozB
+        if weight < 9.5:
+            StateTxt.config(text = "Not Ready", bg = "red")
+            ErrorTxt.config(text = "Add Water", bg = "red")
+        elif weight > 10.5:
+            StateTxt.config(text="Not Ready", bg ="red")
+            ErrorTxt.config(text = "Remove Water", bg = "red")
+        elif 9.5 < weight < 10.5:
+            ErrorTxt.config(text = "Good", bg = "green")
+            StateTxt.config(text = "Brewing", bg = "yellow")
+            if temp < 95:
+                tozB = 1
+                temp+=1
+                print("temp increased ", temp)
+                Window.after(100, tenozcheck)
+            else:
+                tozB = 0
+                StateTxt.config(text = "Ready", bg = "green")
+                print("Temp done")
 
 
+def twelveozcheck():
+    if weight < 11.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Add Water", bg="red")
+    elif weight > 12.5:
+        StateTxt.config(text="Not Ready", bg="red")
+        ErrorTxt.config(text="Remove Water", bg="red")
+    elif 11.5 < weight < 12.5:
+        ErrorTxt.config(text="Good", bg="green")
+        StateTxt.config(text = "Brewing", bg = "yellow")
+        if temp < 95:
+            global twozB
+            twozB = 1
+            temp += 1
+            print("Temp increased ", temp)
+            Window.after(100, twelveozcheck)
+        else:
+            twozB = 0
+            StateTxt.config(text = "Ready", bg = "green")
+            print("Temp done")
+#--------------------------------------------------------------------
 Window.geometry("480x320")
 Window.configure(background = 'black')
 
