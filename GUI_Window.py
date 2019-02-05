@@ -132,6 +132,16 @@ def twelveozcheck():
             twozB = 0
             StateTxt.config(text = "Ready", bg = "green")
             print("Temp done")
+
+def endbutton():
+    global eozB, nozB, tozB, elozB, twozB
+    eozB = 0
+    nozB = 0
+    tozB = 0
+    elozB = 0
+    twozB = 0
+    StateTxt.config(text = "Ended", bg = "yellow")
+    ErrorTxt.config(text = "Ended", bg = "yellow")
 #--------------------------------------------------------------------
 Window.geometry("480x320")
 Window.configure(background = 'black')
@@ -164,7 +174,7 @@ elevenozB.place(x = 250, y = 60)
 twelveozB = Button(Window, text = "12oz", width = 6, font = 20, bg = "cyan", command = twelveozcheck)
 twelveozB.place(x = 330, y = 60)
 
-endB = Button(Window, text = "STOP", width = 6, font = 20, bg = "red")
+endB = Button(Window, text = "STOP", width = 6, font = 20, bg = "red", command = endbutton)
 endB.place(x= 410, y=60)
 #-----------------------------------------------------------------------------
 
