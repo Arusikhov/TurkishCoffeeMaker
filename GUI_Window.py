@@ -1,196 +1,221 @@
 #Andrew Beechko
 #CSE 308 Project GUI
-#Last Edited 2-3-19
+#Last Edited 2-5-2019
 
 from tkinter import *
 from PIL import Image, ImageTk
 import time
+from threading import Thread
+#---------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------
+#functions
 
 
+def combine_funcs(*funcs):#an attempt to have one button trigger multiple functions
+    def combined_func(*args, **kwargs):
+        for f in funcs:
+            f(*args, **kwargs)
+    return combined_func
 
-#------------------------------------
-#Test Data
-weight = 10
-temp = 80
-################################################################################################
-#Window program
-Window = Tk()
-#-----------------------------------
-#Runtime Variable Triggers
-eozB = 0
-nozB = 0
-tozB = 0
-elozB = 0
-twozB = 0
-
-#----------------------------------------------------------------------------
-#Functions
-def eightozcheck(): #button command def
-    global temp #makes temp variable accessible in the function
-    if weight < 7.5:    #checks to see if weight is within the range of the button
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Add Water", bg="red")
-    elif weight > 8.5:
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Remove Water", bg="red")
-    elif 7.5 < weight < 8.5:    #if weight is in range, starts our loop
-        ErrorTxt.config(text=" ", bg="green")
-        StateTxt.config(text="Brewing", bg="yellow")
-        if temp < 95:   #as long as the temp is below this number, the loop will continue and commands can be performed
-            global eozB
-            eozB = 1
-            temp += 1
-            print("temp increased")
-            Window.after(100, eightozcheck) #updates the display so the window wont freeze durring rintime
-        else:#breaks out of the loop once the temp condition is met and changes lables
-            eozB = 0
-            StateTxt.config(text="Ready", bg="green")
-            print("temp done")
-
-def nineozcheck():
-    global temp
-    if weight<8.5:
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Add Water", bg="red")
-    elif weight > 9.5:
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Remove Water", bg="red")
-    elif 8.5< weight <9.5:
-        ErrorTxt.config(text=" ", bg="green")
-        StateTxt.config(text="Brewing", bg="yellow")
-        if temp < 95:
-            global nozB
-            nozB += 1
-            print("Temp increased")
-            Window.after(100, nineozcheck)
-        else:
-            nozB = 0
-            StateTxt.config(text="Ready", bg="green")
-            print("temp done")
+def raise_frame(frame):#is used to toggle between frames
+    frame.tkraise()
 
 
-def tenozcheck():
-        global temp
-        global tozB
-        if weight < 9.5:
-            StateTxt.config(text = "Not Ready", bg = "red")
-            ErrorTxt.config(text = "Add Water", bg = "red")
-        elif weight > 10.5:
-            StateTxt.config(text="Not Ready", bg ="red")
-            ErrorTxt.config(text = "Remove Water", bg = "red")
-        elif 9.5 < weight < 10.5:
-            ErrorTxt.config(text = "Good", bg = "green")
-            StateTxt.config(text = "Brewing", bg = "yellow")
-            if temp < 95:
-                tozB = 1
-                temp+=1
-                print("temp increased ", temp)
-                Window.after(100, tenozcheck)
+def guithread():
+    athread = Thread(target=myGUI)
+    athread.setDaemon(True)
+    athread.start()
+
+
+#-------------------------------------------------------------------------------------
+
+class myGUI:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("MyGUI")
+        #---------------------------
+        #the dictionary
+        f = open("DataFile.txt")
+        lines = f.readlines()
+        f.close()
+
+        MyDictionary = {
+            "NWweight": int(lines[1]),
+            "Wweight": int(lines[2]),
+            "SenseWeight": int(lines[0]),
+            "Temperature": int(lines[3]),
+            "Vibration": int(lines[4]),
+            "EndBStat": lines[5]
+        }
+
+        #-------------------------------------------------------
+        #Functions
+
+
+        def recordclickNW(self):#the record button
+            sweight = MyDictionary["SenseWeight"]
+            if sweight < 20:
+                self.ErrorTxt2.config(text = "No Jazzve Detected")
             else:
-                tozB = 0
-                StateTxt.config(text = "Ready", bg = "green")
-                print("Temp done")
+                sweight = str(sweight)
+                # opening files
 
-def elevenozcheck():
-    if weight < 10.5:
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Add Water", bg="red")
-    elif weight > 11.5:
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Remove Water", bg="red")
-    elif 10.5 < weight < 11.5:
-        ErrorTxt.config(text="Good", bg="green")
-        StateTxt.config(text="Brewing", bg="yellow")
-        if temp < 95:
-            global elozB
-            elozB += 1
-            print("temp increased")
-            Window.after(100, elevenozcheck)
-        else:
-            elozB = 0
-            StateTxt.config(text="Ready", bg="green")
-            print("Temp done")
+                NWfile = open('Data_No_Water.txt', "r")
+                NWfiledata = NWfile.read()  # read in line from file
+                NWfile.close()
+                Newfiledata = NWfiledata.replace(NWfiledata, sweight)  # replacing text
+                f = open("Data_No_Water.txt", "w")
+                f.write(Newfiledata)
+                f.close()
+                self.ErrorTxt2.config(text="No Water Weight Recorded")
+
+        def recordclickW(self):#the record button
+            sweight = MyDictionary["SenseWeight"]
+            if sweight < 20:
+                self.ErrorTxt2.config(text = "No Jazzve Detected")
+            else:
+                sweight = str(sweight)
+                # opening files
+
+                Wfile = open('Data_With_Water.txt', "r")
+                Wfiledata = Wfile.read()  # read in line from file
+                Wfile.close()
+                Newfiledata = Wfiledata.replace(Wfiledata, sweight)  # replacing text
+                f = open("Data_With_Water.txt", "w")
+                f.write(Newfiledata)
+                f.close()
+                self.ErrorTxt2.config(text="With Water Weight Recorded")
+
+        def EndBtoggle(self):#turns EndBStat to 1 which is ment to end the induction controll loop
+            MyDictionary["EndBStat"] = "True"
+            self.StateTxt.config(text = "idle", bg = "yellow")
+            self.ErrorTxt1.config(text = "End Press", bg = "green")
 
 
-def twelveozcheck():
-    if weight < 11.5:
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Add Water", bg="red")
-    elif weight > 12.5:
-        StateTxt.config(text="Not Ready", bg="red")
-        ErrorTxt.config(text="Remove Water", bg="red")
-    elif 11.5 < weight < 12.5:
-        ErrorTxt.config(text="Good", bg="green")
-        StateTxt.config(text = "Brewing", bg = "yellow")
-        if temp < 95:
-            global twozB
-            twozB = 1
-            temp += 1
-            print("Temp increased ", temp)
-            Window.after(100, twelveozcheck)
-        else:
-            twozB = 0
-            StateTxt.config(text = "Ready", bg = "green")
-            print("Temp done")
+        def StartButtonF(self):  # button command def
+            if MyDictionary["NWweight"] > MyDictionary["SenseWeight"]:  # checks to see if weight is within the range of the button
+                self.StateTxt.config(text="Idle", bg="yellow")
+                self.ErrorTxt1.config(text="Missing Jazzve", bg="red")
+            elif MyDictionary["NWweight"] < MyDictionary["SenseWeight"] < MyDictionary["Wweight"] - 5:
+                self.StateTxt.config(text="Idle", bg="yellow")
+                self.ErrorTxt1.config(text="Add Water", bg="red")
+            elif MyDictionary["SenseWeight"] > MyDictionary["Wweight"] + 5:
+                self.StateTxt.config(text="Idle", bg="yellow")
+                self.ErrorTxt1.config(text="Too Heavy", bg="red")
+            elif MyDictionary["Wweight"] - 5 < MyDictionary["SenseWeight"] < MyDictionary["Wweight"] + 5:  # if weight is in range, starts our loop
+                MyDictionary["EndBStat"] = 0
+                InductionThread(self)
 
-def endbutton():#resets all runtime variable triggers
-    global eozB, nozB, tozB, elozB, twozB
-    eozB = 0
-    nozB = 0
-    tozB = 0
-    elozB = 0
-    twozB = 0
-    StateTxt.config(text = "Ended", bg = "yellow")
-    ErrorTxt.config(text = "Ended", bg = "yellow")
-#--------------------------------------------------------------------
-#Window Format
+        def InductionAuto(self):  # need to make this a thread, checks temp and vib and toggles induction bassed off of these
+            while MyDictionary["EndBStat"] == 0:  # checks endB and if it is 0, runs the loop
+                # Turn on the induction heater
+                if MyDictionary["Temperature"] < 200:
+                    self.ErrorTxt1.config(text=" ", bg="green")
+                    self.StateTxt.config(text="Brewing", bg="yellow")
+                elif MyDictionary["Temperature"] > 200:
+                    if MyDictionary["Vibration"] == 1:
+                        self.ErrorTxt1.config(text=" ", bg="green")
+                        self.StateTxt.config(text="Ready", bg="green")
+                        #turn off induction heater
 
-Window.geometry("480x320")
-Window.configure(background = 'black')
-#-------------------------------------------------------------------
-#Lables
-
-StateTxt = Label(Window, relief = RIDGE,bg = "green", text = "Waiting", font = 20, width = 8)
-StateTxt.place(x=40, y= 160)
-
-ErrorTxt = Label(Window, relief = RIDGE,bg = "green", text = " ", font = 20, width = 12 )
-ErrorTxt.place(x = 20, y = 220)
-
-TopTxt = Label(Window, text = "The Perfect Brew", relief = RIDGE, bg = "cyan", font = 20, width = 16)
-TopTxt.pack(side = TOP)
-
-#---------------------------------------------------------------------
-#Buttons
-
-eightozB = Button(Window, text = "8oz", width = 6, font = 20, bg = "cyan", command = eightozcheck)
-eightozB.place(x = 10, y = 60)
-
-nineozB = Button(Window, text = "9oz", width = 6, font = 20, bg = "cyan", command = nineozcheck)
-nineozB.place(x=90, y = 60)
-
-tenozB = Button(Window, text = "10oz", width = 6, font = 20, bg = "cyan", command = tenozcheck)
-tenozB.place(x = 170, y = 60)
-
-elevenozB = Button(Window, text = "11oz", width = 6, font = 20, bg = "cyan", command = elevenozcheck)
-elevenozB.place(x = 250, y = 60)
-
-twelveozB = Button(Window, text = "12oz", width = 6, font = 20, bg = "cyan", command = twelveozcheck)
-twelveozB.place(x = 330, y = 60)
-
-endB = Button(Window, text = "STOP", width = 6, font = 20, bg = "red", command = endbutton)
-endB.place(x= 410, y=60)
-#-----------------------------------------------------------------------------
-#Immage
-
-im = Image.open("TurkishCoffeMakerImage.png")
-photo = ImageTk.PhotoImage(im)
-Pic = Label(Window, image = photo)
-Pic.image = photo
-Pic.pack()
-Pic.place(x= 220, y = 100)
-#----------------------------------------------------------------------------
+        #def updateDict(self):
 
 
 
-#end of window loop
-Window.mainloop()
+
+
+        #Threads
+        '''
+        def updateThread(self):
+            athread = Thread(target = updateDict(self))
+            athread.setDaemon(True)
+            athread.start()
+        '''
+
+        def InductionThread(self):  # this turns the StartButtonF into a thread in order to run in parallel
+            mythread = Thread(target=InductionAuto(self))  # assigns the button to the thread
+            mythread.setDaemon(True)
+            mythread.start()
+        #---------------------------------------------------------------------------------------------------------
+
+        self.master.geometry("480x320")
+
+        self.f1 = Frame(self.master)  # putting frame in the main window module
+        self.f2 = Frame(self.master)
+
+        for frame in (self.f1, self.f2):  # assigning dimensions of frame and making it the size of the window
+            frame.place(x=0, y=0, relheight=1, relwidth=1)  # (x,y) topL corner position, (relh,w) seting proportion relative to parent object
+            frame.configure(bg="black")
+        #-----------------------------------------------------------------------------
+        # f1 widgets
+
+        self.TopTxt = Label(self.f1, text="The Perfect Brew", relief=RIDGE, bg="cyan", font=20, width=16)
+        self.TopTxt.pack(side=TOP)
+
+        self.StartB = Button(self.f1, text="Start", width=8, font=40, bg="cyan", command= lambda: StartButtonF(self))
+        self.StartB.place(x=190, y=70)
+
+        self.EndB = Button(self.f1, text="End", width=8, font=40, bg="cyan", command=lambda: EndBtoggle(self))
+        self.EndB.place(x = 360, y = 70)
+
+        self.ConfigB = Button(self.f1, text="Configure", width=8, font=40, bg="cyan", command=lambda: raise_frame(self.f2))
+        self.ConfigB.place(x = 20, y = 70)
+
+        self.StateLabel = Label(self.f1,text = "State:", fg = "white", bg = "black", width = 8, font = 40)
+        self.StateLabel.place(x = 10, y = 240)
+        self.StateTxt = Label(self.f1, relief=RIDGE, bg="green", text="Waiting", font=20, width=8)
+        self.StateTxt.place(x = 90, y = 240)
+
+        self.ErrorLabel = Label(self.f1, text = "Error:", fg = "white", bg = "black", width = 8, font = 40)
+        self.ErrorLabel.place(x = 10, y = 280)
+        self.ErrorTxt1 = Label(self.f1, relief=RIDGE, bg="green", text=" ", font=20, width=12)
+        self.ErrorTxt1.place(x = 90, y = 280)
+
+        self.TempLabel = Label(self.f1, text = "Temperature:", fg = "white", bg = "black", width = 11, font = 40)
+        self.TempLabel.place(x = 20, y = 130)
+        self.TempDisp = Label(self.f1, text = MyDictionary["Temperature"], fg = "white", bg = "black", width = 4, font = 40)
+        self.TempDisp.place(x = 155, y = 130)
+
+        self.WeightLabel = Label(self.f1, text = "Sensor Weight:", fg = "white", bg = "black", width = 12, font = 40 )
+        self.WeightLabel.place(x = 20, y = 170)
+        self.WeightDisp = Label(self.f1, text = MyDictionary["SenseWeight"], fg = "white", bg = "black", width = 4, font = 40)
+        self.WeightDisp.place(x = 155, y = 170)
+
+        #Picture
+        im = Image.open("TurkishCoffeMakerImage.png")
+        photo = ImageTk.PhotoImage(im)
+        self.Pic = Label(self.f1, image=photo)
+        self.Pic.image = photo
+        self.Pic.place(x=280, y=120)
+        # ----------------------------------------------------------------------------------------------------------------
+        # f2 widgets
+
+        self.ConfigBack = Button(self.f2, text="Go Back", width=8, font=40, bg="cyan", command=lambda: raise_frame(self.f1))
+        self.ConfigBack.place(x = 40, y = 40)
+
+        self.RecordBNW = Button(self.f2, text="Empty Jazzve", width=14, font=40, bg="cyan", command=lambda: recordclickNW(self))
+        self.RecordBNW.place(x = 220, y = 20)
+
+        self.RecordBW = Button(self.f2, text = "Full Jazzve", width=14, font=40, bg="cyan", command = lambda: recordclickW(self))
+        self.RecordBW.place(x = 220, y = 70)
+
+        self.ErrorTxt2 = Label(self.f2, relief=RIDGE, bg="yellow", text=" ", font=20, width=25)
+        self.ErrorTxt2.place(x = 100, y = 280)
+
+        self.InstrTxt = Label(self.f2, relief=RIDGE,fg = "white", bg="black",wraplength = 260, text="This Window is used to Configure your coffee maker. Once you have the Jazzve prepared, put it in the coffee maker and press the relavent button.", font=15, width=25)
+        self.InstrTxt.place(x = 100, y = 120)
+
+
+        raise_frame(self.f1)
+        #updateThread(self)
+
+
+
+
+root = Tk()
+my_gui = myGUI(root)
+guithread()
+root.mainloop()
+
+
+
