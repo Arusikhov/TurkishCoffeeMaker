@@ -17,6 +17,10 @@ if not EMULATE_HX711:
     from hx711 import HX711
 else:
     from emulated_hx711 import HX711
+#-----------------------------------
+#Library for Temperature Sensor
+from mlx90614 import MLX90614
+
 #########################################################################################
 #the dictionary
 f = open("Data_No_Water.txt", "r")
@@ -47,7 +51,7 @@ MyDictionary = {
     "NWweight": int(NWWeight),
     "Wweight": int(WWeight),
     "SenseWeight": float(SWeight),
-    "Temperature": int(Temperature),
+    "Temperature": float(Temperature),
     "Vibration": int(Vibr),
     "EndBStat": EndBStat
     }
@@ -93,7 +97,7 @@ def updatedict():#updates the dictionary and variables that are used for program
         "NWweight": int(NWWeight),
         "Wweight": int(WWeight),
         "SenseWeight": float(SWeight),
-        "Temperature": int(Temperature),
+        "Temperature": float(Temperature),
         "Vibration": int(Vibr),
         "EndBStat": EndBStat
     }
@@ -270,7 +274,12 @@ hx.set_reading_format("MSB", "MSB")
 hx.set_reference_unit(1)
 
 hx.reset()
-#----------------------------------------
+#------------------------------
+#Stuff for Temp Sensor
+thermometer_address = 0x5a
+
+thermometer = MLX90614(thermometer_address)
+#------------------------------
 
 
 while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
@@ -291,7 +300,7 @@ while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
 
         #putting sensor data in text file to be read
         f = open("Data_Sensor_Weight.txt", "w")
-        f.write(str(round(val,2)))
+        f.write(str(round(val,1)))
         f.close()
         
         hx.power_down()
@@ -299,8 +308,16 @@ while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
         time.sleep(0.1)
     except (KeyboardInterrupt, SystemExit):
         cleanAndExit()
+    #---------------------------------------------------------------------------
+    #Temperature Sensor Code
+    Temp = thermometer.get_obj_temp()
+    
+    f = open("Data_Temperature.txt", "w")
+    f.write(str(round(Temp,1)))
+    f.close()
+    
     #----------------------------------------------------------------------------
-    #Update code to endure GUI labels and stats stay uup to date in real time
+    #Update code to endure GUI labels and stats stay up to date in real time
     time.sleep(.5)
     updatedict()
     Window.update()
