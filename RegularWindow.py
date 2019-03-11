@@ -17,9 +17,7 @@ if not EMULATE_HX711:
     from hx711 import HX711
 else:
     from emulated_hx711 import HX711
-#------------------------------------------
-
-#--------------------------------------------------------------------------
+#########################################################################################
 #the dictionary
 f = open("Data_No_Water.txt", "r")
 NWWeight = f.read()
@@ -45,8 +43,6 @@ f = open("Data_EndB_Stat.txt", "r")
 EndBStat = f.read()
 f.close()
 
-
-
 MyDictionary = {
     "NWweight": int(NWWeight),
     "Wweight": int(WWeight),
@@ -56,9 +52,7 @@ MyDictionary = {
     "EndBStat": EndBStat
     }
 
-
-
-#---------------------------------------------------------------------------
+######################################################################################################
 #Functions
 def cleanAndExit():#Function for cleaning up GPIO pins for sensor
     print("Cleaning...")
@@ -68,13 +62,12 @@ def cleanAndExit():#Function for cleaning up GPIO pins for sensor
     print("Bye!")
     sys.exit()
 
-
-
-def updatedict():#updates the dictionary
-    global MyDictionary
-    f = open("Data_No_Water.txt", "r")
-    NWWeight = f.read()
-    f.close()
+#------------------------------------------------------------------------------------------------
+def updatedict():#updates the dictionary and variables that are used for program management
+    global MyDictionary                 #makes the dictionary able to be modified by this function
+    f = open("Data_No_Water.txt", "r")  #opens file to read
+    NWWeight = f.read()                 #assigns contents of this file to NWWeight
+    f.close()                           #closes the file so that the program is able to continue
 
     f = open("Data_With_Water.txt", "r")
     WWeight = f.read()
@@ -96,7 +89,7 @@ def updatedict():#updates the dictionary
     EndBStat = f.read()
     f.close()
 
-    MyDictionary = {
+    MyDictionary = {                    #Assigns variables from the text files to the dictionary updating it
         "NWweight": int(NWWeight),
         "Wweight": int(WWeight),
         "SenseWeight": float(SWeight),
@@ -105,59 +98,48 @@ def updatedict():#updates the dictionary
         "EndBStat": EndBStat
     }
 
-    global NWDispV
+    global NWDispV                      #Makes the StringVar values able to be manipulated
     global WDispV
     global SeWeDispV
     global TempDispV
     global VibDispV
     global EBSDispV
 
-    NWDispV.set(NWWeight)
+    NWDispV.set(NWWeight)               #updates the String Var values similar to the dictionary above
     WDispV.set(WWeight)
     SeWeDispV.set(SWeight)
     TempDispV.set(Temperature)
     VibDispV.set(Vibr)
     EBSDispV.set(EndBStat)
 
-    print(MyDictionary)
-    #Window.after(2000, updatedict())
+    print(MyDictionary)                 #Is troubleshooting code that prints the dictionary contents in terminal
 
-#--------------------------------------------------------------------------
-'''
-#updates the display
-def DisplayUpdate():
-    TempDisp.config(text = MyDictionary["Temperature"])
-    WeightDisp.config(text = MyDictionary["SenseWeight"])
-
-    WDisp.config(MyDictionary["Wweight"])
-    NWDisp.config(text = MyDictionary["NWweight"])
-'''
-#-------------------------------------------------------------------------
+#--------------------------------------------------------------------------------
 def raise_frame(frame):#is used to toggle between frames
     frame.tkraise()
 
-
-def recordclickNW():  # the record button
+#-------------------------------------------------------------------------------
+def recordclickNW():  # the record button for No Water Data
     sweight = MyDictionary["SenseWeight"]
     if sweight < 20:
-        ErrorTxt2.config(text="No Jazzve Detected")
+        ErrorTxt2.config(text="No Jazzve Detected")     #is safety check ensuring that the weight sensor is not empty
     else:
-        sweight = str(sweight)
-        # opening files
+        sweight = str(sweight)                          #setting the dictionary value to a string so that the data can be put into a text file
 
-        f = open("Data_No_Water.txt", "w")
+        f = open("Data_No_Water.txt", "w")              #is writing data from sensor weight to No Water file
         f.write(sweight)
         f.close()
         ErrorTxt2.config(text="No Water Weight Recorded")
-        updatedict()
 
-def recordclickW():#the record button
-    sweight = MyDictionary["SenseWeight"]
+        updatedict()                                    #is used to update the contents of the dictionary
+
+#----------------------------------------------------------------------------------
+def recordclickW():#the record button for with water file
+    sweight = MyDictionary["SenseWeight"]       #same as recordclickNW function
     if sweight < 20:
         ErrorTxt2.config(text = "No Jazzve Detected")
     else:
         sweight = str(sweight)
-        # opening file
 
         f = open("Data_With_Water.txt", "w")
         f.write(sweight)
@@ -165,24 +147,31 @@ def recordclickW():#the record button
         ErrorTxt2.config(text="With Water Weight Recorded")
         updatedict()
 
-def EndBtoggle():#turns EndBStat to 1 which is ment to end the induction controll loop
-    f = open("Data_EndBStat.txt", "w")
+#---------------------------------------------------------------------------------
+def EndBtoggle():#turns EndBStat to true which is ment to end the induction controll loop
+    f = open("Data_EndBStat.txt", "w")  #writes true to the text file and updates f1 labels
     f.write("True")
     f.close()
     ErrorTxt1.config(text="End Pressed")
     StateTxt.config(text = "idle", bg = "yellow")
+
     updatedict()
 
-def StartBtoggle():
+#---------------------------------------------------------------------------------
+def StartBtoggle():#turns EndBStat to false which should start the induction loop
     f = open("Data_EndBStat.txt", "w")
     f.write("False")
     f.close()
     ErrorTxt1.config(text = "Start Pressed")
-#---------------------------------------------------------------------------------------
 
+    updatedict()
+
+###############################################################################################################
+#starting the tkinter module
 Window = Tk.Tk()
 Window.geometry("480x320")
 
+#all of the StringVar for updating lables in real time
 NWDispV = StringVar()
 NWDispV.set(NWWeight)
 WDispV = StringVar()
@@ -195,7 +184,7 @@ VibDispV = StringVar()
 VibDispV.set(Vibr)
 EBSDispV = StringVar()
 EBSDispV.set(EndBStat)
-
+#------------------------------------------------------------------------------------
 f1 = Frame(Window)  # putting frame in the main window module
 f2 = Frame(Window)
 
@@ -207,7 +196,7 @@ for frame in (f1, f2):  # assigning dimensions of frame and making it the size o
 TopTxt = Label(f1, text="The Perfect Brew", relief=RIDGE, bg="cyan", font=20, width=16)
 TopTxt.pack(side=TOP)
 
-StartB = Button(f1, text="Start", width=8, font=40, bg="cyan", command= lambda: StartBtoggle)
+StartB = Button(f1, text="Start", width=8, font=40, bg="cyan", command= lambda: StartBtoggle)   #lambda is to ensure that this command only runs once and only when clicked
 StartB.place(x=190, y=70)
 
 EndB = Button(f1, text="End", width=8, font=40, bg="cyan", command=lambda: EndBtoggle())
@@ -228,7 +217,7 @@ ErrorTxt1.place(x = 90, y = 280)
 
 TempLabel = Label(f1, text = "Temperature:", fg = "white", bg = "black", width = 11, font = 40)
 TempLabel.place(x = 20, y = 130)
-TempDisp = Label(f1, textvariable = TempDispV, fg = "white", bg = "black", width = 4, font = 40)
+TempDisp = Label(f1, textvariable = TempDispV, fg = "white", bg = "black", width = 4, font = 40)    #this uses textvariable and StringVar to keep labels up to date in real time
 TempDisp.place(x = 155, y = 130)
 
 WeightLabel = Label(f1, text = "Sensor Weight:", fg = "white", bg = "black", width = 12, font = 40 )
@@ -237,14 +226,14 @@ WeightDisp = Label(f1, textvariable = SeWeDispV, fg = "white", bg = "black", wid
 WeightDisp.place(x = 155, y = 170)
 
 #Picture
-im = Image.open("TurkishCoffeMakerImage.png")
-photo = ImageTk.PhotoImage(im)
-Pic = Label(f1, image=photo)
-Pic.image = photo
-Pic.place(x=280, y=120)
+im = Image.open("TurkishCoffeMakerImage.png")   #opens the image
+photo = ImageTk.PhotoImage(im)                  #sets the image to a tkinter photoimage object
+Pic = Label(f1, image=photo)                    #creates a label holding the picture
+Pic.image = photo                               #may not be needed
+Pic.place(x=280, y=120)                         #places the image in the f1 frame
+
 # ----------------------------------------------------------------------------------------------------------------
 # f2 widgets
-
 ConfigBack = Button(f2, text="Go Back", width=8, font=40, bg="cyan", command=lambda: raise_frame(f1))
 ConfigBack.place(x = 40, y = 40)
 
@@ -270,8 +259,8 @@ ErrorTxt2.place(x = 190, y = 280)
 InstrTxt = Label(f2, relief=RIDGE,fg = "white", bg="black",wraplength = 260, text="This Window is used to Configure your coffee maker. Once you have the Jazzve prepared, put it in the coffee maker and press the relavent button.", font=15, width=25)
 InstrTxt.place(x = 190, y = 120)
 
-
-raise_frame(f1)
+#---------------------------------------------------------------------------------------------
+raise_frame(f1) #ensures that the f1 frame is on top once the program boots up
 
 #----------------------
 #Stuff for Weight Sensor
@@ -311,12 +300,12 @@ while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
     except (KeyboardInterrupt, SystemExit):
         cleanAndExit()
     #----------------------------------------------------------------------------
-
-        
+    #Update code to endure GUI labels and stats stay uup to date in real time
     time.sleep(.5)
     updatedict()
     Window.update()
-    #The start loop
+    #-------------------------------------------------------------------------------
+    #main control loop for interpreting sensor data and toggling the induction heater
     if MyDictionary["EndBStat"] == "False":
         if int(MyDictionary["SenseWeight"]) < int(MyDictionary["NWweight"]):
             ErrorTxt1.config(text = "No Jazzve Detected", bg = "yellow")
