@@ -3,8 +3,22 @@ import tkinter as Tk
 #from tkinter import StringVar
 from PIL import Image, ImageTk
 from threading import Thread
-
+#------------------------------------------
+#Library for weight Sensor
 import time
+import sys
+from hx711 import HX711
+import RPi.GPIO as GPIO
+
+EMULATE_HX711=False
+
+if not EMULATE_HX711:
+    import RPi.GPIO as GPIO
+    from hx711 import HX711
+else:
+    from emulated_hx711 import HX711
+#------------------------------------------
+
 #--------------------------------------------------------------------------
 #the dictionary
 f = open("Data_No_Water.txt", "r")
@@ -36,7 +50,7 @@ f.close()
 MyDictionary = {
     "NWweight": int(NWWeight),
     "Wweight": int(WWeight),
-    "SenseWeight": int(SWeight),
+    "SenseWeight": float(SWeight),
     "Temperature": int(Temperature),
     "Vibration": int(Vibr),
     "EndBStat": EndBStat
@@ -45,6 +59,17 @@ MyDictionary = {
 
 
 #---------------------------------------------------------------------------
+#Functions
+def cleanAndExit():#Function for cleaning up GPIO pins for sensor
+    print("Cleaning...")
+
+    if not EMULATE_HX711:
+        GPIO.cleanup()
+    print("Bye!")
+    sys.exit()
+
+
+
 def updatedict():#updates the dictionary
     global MyDictionary
     f = open("Data_No_Water.txt", "r")
@@ -74,7 +99,7 @@ def updatedict():#updates the dictionary
     MyDictionary = {
         "NWweight": int(NWWeight),
         "Wweight": int(WWeight),
-        "SenseWeight": int(SWeight),
+        "SenseWeight": float(SWeight),
         "Temperature": int(Temperature),
         "Vibration": int(Vibr),
         "EndBStat": EndBStat
@@ -248,8 +273,46 @@ InstrTxt.place(x = 190, y = 120)
 
 raise_frame(f1)
 
+#----------------------
+#Stuff for Weight Sensor
+hx = HX711(5, 6)
+hx.set_reading_format("MSB", "MSB")
+
+hx.set_reference_unit(1)
+
+hx.reset()
+#----------------------------------------
+
 
 while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
+    #--------------------------------------------------------------------
+    #code for weight sensor input
+    try:
+        # These three lines are usefull to debug wether to use MSB or LSB in the reading formats
+        # for the first parameter of "hx.set_reading_format("LSB", "MSB")".
+        # Comment the two lines "val = hx.get_weight(5)" and "print val" and uncomment the three lines to see what it prints.
+        if False:
+            np_arr8_string = hx.get_np_arr8_string()
+            binary_string = hx.get_binary_string()
+            #print(binary_string + " " + np_arr8_string)
+        # Prints the weight. Comment if you're debbuging the MSB and LSB issue.
+        #val = hx.get_weight(5)
+        val = (1.88*pow(10, -9)*(hx.read_long()**2))+ (0.0019367*hx.read_long())-67
+        print(val)
+
+        #putting sensor data in text file to be read
+        f = open("Data_Sensor_Weight.txt", "w")
+        f.write(str(round(val,2)))
+        f.close()
+        
+        hx.power_down()
+        hx.power_up()
+        time.sleep(0.1)
+    except (KeyboardInterrupt, SystemExit):
+        cleanAndExit()
+    #----------------------------------------------------------------------------
+
+        
     time.sleep(.5)
     updatedict()
     Window.update()
