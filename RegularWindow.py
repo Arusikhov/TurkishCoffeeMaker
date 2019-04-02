@@ -20,6 +20,9 @@ else:
 #-----------------------------------
 #Library for Temperature Sensor
 from mlx90614 import MLX90614
+#-----------------------------
+#Library for Vibration Sensor
+from Vibration_Sensor_Code1 import *
 
 #########################################################################################
 #the dictionary
@@ -48,8 +51,8 @@ EndBStat = f.read()
 f.close()
 
 MyDictionary = {
-    "NWweight": int(NWWeight),
-    "Wweight": int(WWeight),
+    "NWweight": float(NWWeight),
+    "Wweight": float(WWeight),
     "SenseWeight": float(SWeight),
     "Temperature": float(Temperature),
     "Vibration": int(Vibr),
@@ -94,11 +97,11 @@ def updatedict():#updates the dictionary and variables that are used for program
     f.close()
 
     MyDictionary = {                    #Assigns variables from the text files to the dictionary updating it
-        "NWweight": int(NWWeight),
-        "Wweight": int(WWeight),
+        "NWweight": float(NWWeight),
+        "Wweight": float(WWeight),
         "SenseWeight": float(SWeight),
         "Temperature": float(Temperature),
-        "Vibration": int(Vibr),
+        "Vibration": float(Vibr),
         "EndBStat": EndBStat
     }
 
@@ -153,17 +156,18 @@ def recordclickW():#the record button for with water file
 
 #---------------------------------------------------------------------------------
 def EndBtoggle():#turns EndBStat to true which is ment to end the induction controll loop
-    f = open("Data_EndBStat.txt", "w")  #writes true to the text file and updates f1 labels
+    f = open("Data_EndB_Stat.txt", "w")  #writes true to the text file and updates f1 labels
     f.write("True")
     f.close()
     ErrorTxt1.config(text="End Pressed")
     StateTxt.config(text = "idle", bg = "yellow")
+    GPIO.output(12, GPIO.LOW)
 
     updatedict()
 
 #---------------------------------------------------------------------------------
 def StartBtoggle():#turns EndBStat to false which should start the induction loop
-    f = open("Data_EndBStat.txt", "w")
+    f = open("Data_EndB_Stat.txt", "w")
     f.write("False")
     f.close()
     ErrorTxt1.config(text = "Start Pressed")
@@ -200,7 +204,7 @@ for frame in (f1, f2):  # assigning dimensions of frame and making it the size o
 TopTxt = Label(f1, text="The Perfect Brew", relief=RIDGE, bg="cyan", font=20, width=16)
 TopTxt.pack(side=TOP)
 
-StartB = Button(f1, text="Start", width=8, font=40, bg="cyan", command= lambda: StartBtoggle)   #lambda is to ensure that this command only runs once and only when clicked
+StartB = Button(f1, text="Start", width=8, font=40, bg="cyan", command= lambda: StartBtoggle())   #lambda is to ensure that this command only runs once and only when clicked
 StartB.place(x=190, y=70)
 
 EndB = Button(f1, text="End", width=8, font=40, bg="cyan", command=lambda: EndBtoggle())
@@ -241,7 +245,7 @@ Pic.place(x=280, y=120)                         #places the image in the f1 fram
 ConfigBack = Button(f2, text="Go Back", width=8, font=40, bg="cyan", command=lambda: raise_frame(f1))
 ConfigBack.place(x = 40, y = 40)
 
-RecordBNW = Button(f2, text="Empty Jazzve", width=14, font=40, bg="cyan", command=lambda: recordclickNW)
+RecordBNW = Button(f2, text="Empty Jazzve", width=14, font=40, bg="cyan", command=lambda: recordclickNW())
 RecordBNW.place(x = 220, y = 20)
 
 RecordBW = Button(f2, text = "Full Jazzve", width=14, font=40, bg="cyan", command = lambda: recordclickW())
@@ -264,8 +268,14 @@ InstrTxt = Label(f2, relief=RIDGE,fg = "white", bg="black",wraplength = 260, tex
 InstrTxt.place(x = 190, y = 120)
 
 #---------------------------------------------------------------------------------------------
+#Default Setup
 raise_frame(f1) #ensures that the f1 frame is on top once the program boots up
 
+f = open("Data_EndB_Stat.txt", "w")  #Defaults endbstat to true
+f.write("True")
+f.close()
+
+timestat = 0
 #----------------------
 #Stuff for Weight Sensor
 hx = HX711(5, 6)
@@ -280,7 +290,12 @@ thermometer_address = 0x5a
 
 thermometer = MLX90614(thermometer_address)
 #------------------------------
-
+#Substitute for induction heater toggle
+GPIO.setup(26, GPIO.OUT)
+GPIO.output(26, GPIO.LOW)
+#---------------------------------
+#Set up for vibration Sensor
+Vib_Start()
 
 while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
     #--------------------------------------------------------------------
@@ -297,6 +312,7 @@ while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
         #val = hx.get_weight(5)
         val = (1.88*pow(10, -9)*(hx.read_long()**2))+ (0.0019367*hx.read_long())-67
         print(val)
+
 
         #putting sensor data in text file to be read
         f = open("Data_Sensor_Weight.txt", "w")
@@ -315,6 +331,13 @@ while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
     f = open("Data_Temperature.txt", "w")
     f.write(str(round(Temp,1)))
     f.close()
+    #--------------------------------------------------------------------------
+    #Vibration Sensor Code
+    vibration = readvalue()
+
+    f = open("Data_Vibration_Sensor.txt", "w")
+    f.write(str(vibration))
+    f.close()
     
     #----------------------------------------------------------------------------
     #Update code to endure GUI labels and stats stay up to date in real time
@@ -326,16 +349,21 @@ while True: #NEED THIS SHIT FOR THE WINDOW TO UPDATE IN REAL TIME
     if MyDictionary["EndBStat"] == "False":
         if int(MyDictionary["SenseWeight"]) < int(MyDictionary["NWweight"]):
             ErrorTxt1.config(text = "No Jazzve Detected", bg = "yellow")
-        elif int(MyDictionary["SenseWeight"]) < int(MyDictionary["Wweight"])-5:
+        elif int(MyDictionary["SenseWeight"]) < int(MyDictionary["Wweight"])-15:
             ErrorTxt1.config(text = "Not Enought Water", bg = "yellow")
-        elif int(MyDictionary["SenseWeight"])> int(MyDictionary["Wweight"])+5:
+        elif int(MyDictionary["SenseWeight"])> int(MyDictionary["Wweight"])+15:
             ErrorTxt1.config(text = "Too Heavy", bg = "yellow")
-        elif int(MyDictionary["Wweight"]) - 5 < int(MyDictionary["SenseWeight"]) < int(MyDictionary["Wweight"])+5:
-            if MyDictionary["Vibration"] == 1:# check the vibration sensor value
-                #toggle Induction Heater
+        elif int(MyDictionary["Wweight"]) - 15 < int(MyDictionary["SenseWeight"]) < int(MyDictionary["Wweight"])+15:
+            if 1150< MyDictionary["Vibration"] < 1250:#checks to see if vibration is in range of state before boiling
+                GPIO.output(26, GPIO.HIGH)
                 print("Induction Heater On")
             else:
-                #toggle Induction heater
-                print("Induction Heater Off")
+                time.sleep(1)
+                timestat+=1
+                print("timestat incrimented")
+                if timestat == 5:
+                    GPIO.output(26, GPIO.LOW)
+                    print("Induction Heater Off")
+                    timestat = 0
 
 Window.mainloop()
